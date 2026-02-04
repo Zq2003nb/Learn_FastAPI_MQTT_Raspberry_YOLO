@@ -1,0 +1,39 @@
+# 捕获 main 流的 RGB 帧（返回 shape 为 (480, 640, 3) 的 numpy 数组）
+rgb_frame = picam2.capture_array(stream="main")
+
+# 捕获 lores 流的低分辨率帧
+lores_frame = picam2.capture_array(stream="lores")
+
+
+
+
+下面是高级捕获暂时不了解
+# 捕获 Request 对象
+with picam2.capture_request() as req:
+    # 获取帧数组（同 capture_array）
+    rgb_frame = req.make_array("main")
+    
+    # 获取摄像头元数据
+    metadata = req.get_metadata()
+    print(f"曝光时间：{metadata['ExposureTime']}，白平衡：{metadata['ColourGains']}")
+    
+    # 保存修改后的帧（可选）
+    req.save("main", "captured_frame.jpg")
+
+
+
+
+下面是保存的方法
+
+# 启动摄像头后，直接保存高清图片（需先配置 still_config）
+picam2.capture_file("shelf_photo.jpg")  # 保存为 JPEG 格式，支持 png/bmp 等
+
+# 启动视频录制（保存为 H.264 编码的 MP4 文件）
+picam2.start_recording("shelf_video.mp4", format="mp4")
+
+# 录制 10 秒
+import time
+time.sleep(10)
+
+# 停止录制
+picam2.stop_recording()

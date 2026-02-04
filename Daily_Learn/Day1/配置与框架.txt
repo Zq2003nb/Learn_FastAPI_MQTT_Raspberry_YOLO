@@ -1,0 +1,39 @@
+# 实例化摄像头（全局唯一，避免重复创建）
+picam2 = Picamera2()
+
+# 动态实时
+camera_config = picam2.create_preview_configuration(
+    main={
+        "size": (640, 480),  # 分辨率 (宽, 高)，推荐 640x480/1280x720（树莓派轻量化）
+        "format": "RGB888"   # 像素格式，main 流仅支持原始格式（RGB888/BGR888/YUV420）
+    },
+    lores={
+        "size": (320, 240),  # 低分辨率辅助流，用于低功耗预览
+        "format": "YUV420"
+    },
+    display="lores"  # 预览时显示 lores 流，节省资源
+)
+
+# 高清拍照配置
+still_config = picam2.create_still_configuration(
+    main={"size": (3280, 2464)},  # 树莓派摄像头最大分辨率（视硬件而定）
+    format="RGB888"
+)
+
+# 视频
+video_config = picam2.create_video_configuration(
+    main={"size": (1280, 720), "format": "YUV420"},
+    encode="main"  # 指定编码流
+)
+
+picam2.configure(video_config)
+
+
+# 使用框架
+# 启动摄像头
+picam2.start()
+
+# 业务逻辑（帧捕获、拍照等）...
+
+# 停止摄像头
+picam2.stop()
