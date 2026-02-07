@@ -1,0 +1,42 @@
+# 先创建model对象
+model = YOLO("yolov8n.pt")
+
+# 然后预测，核心参数见P1
+results = model.predict(...)
+
+# 训练核心命令，data为你的数据集yaml文件路径,详情见P2
+model.train(
+    data="my_dataset.yaml",  # 必须替换为自己的数据集配置文件
+    epochs=30,               # 训练30轮
+    batch=8,                 # 批次大小8（显存不足调小）
+    imgsz=640,               # 图片尺寸640
+    device=0,                # 使用GPU0训练，CPU设为cpu
+    workers=0                # Windows系统必设0，Linux/Mac可设8
+)
+
+
+# 加载训练好的最优模型，详情见P3
+model = YOLO("runs/detect/train/weights/best.pt")
+
+# 验证模型，自动读取yaml中的val集
+metrics = model.val(
+    data="my_dataset.yaml",
+    device=0,result
+    conf=0.5  # 仅统计置信度≥0.5的检测结果
+)
+
+# 打印核心指标
+print("mAP@0.5:", metrics.box.map50)  # 最核心指标，越高模型越好
+print("精确率:", metrics.box.p)        # 检测为正例的样本中，实际为正例的比例
+
+
+
+#P4
+
+# 示例1：导出为ONNX格式（最通用，支持大部分推理框架）
+model.export(format="onnx", imgsz=640, simplify=True)
+
+# 示例2：导出为TensorRT格式（GPU部署速度最快，需提前安装TensorRT）
+# model.export(format="engine", imgsz=640, device=0)
+
+# 导出结果保存路径：与原pt模型同目录，如yolov8n.onnx
